@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: release/1.0.0/win-unpacked/*.exe
+          path: release/1.0.0/win-unpacked/**/*
           retention-days: 30
 
       # Chỉ tạo release khi có tag
@@ -48,7 +48,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: release/1.0.0/win-unpacked/*.exe
+          files: release/1.0.0/win-unpacked/**/*
           draft: false
           prerelease: false
         env:
