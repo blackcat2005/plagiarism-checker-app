@@ -53,10 +53,10 @@ const baseConfig = {
       //   target: 'zip',
       //   arch: 'x64'
       // },
-      {
-        target: 'portable',
-        arch: 'x64'
-      },
+      // {
+      //   target: 'portable',
+      //   arch: 'x64'
+      // },
       {
         target: 'nsis',
         arch: 'x64'
