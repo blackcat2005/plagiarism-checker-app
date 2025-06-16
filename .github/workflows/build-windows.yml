@@ -36,19 +36,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compress win-unpacked
+        run: |
+          cd release/1.0.0
+          7z a win-unpacked.zip win-unpacked/*
+        shell: bash
+
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: release/1.0.0/win-unpacked/**/*
+          path: release/1.0.0/win-unpacked.zip
           retention-days: 30
 
-      # Chỉ tạo release khi có tag
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: release/1.0.0/win-unpacked/**/*
+          files: release/1.0.0/win-unpacked.zip
           draft: false
           prerelease: false
         env:
