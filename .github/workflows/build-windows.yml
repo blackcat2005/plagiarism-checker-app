@@ -25,11 +25,6 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      # Thử rebuild thủ công, chỉ rebuild các module cần thiết
-      - name: Electron Rebuild
-        run: npx electron-rebuild -f -w better-sqlite3,keytar
-        continue-on-error: true # Tiếp tục nếu bước này lỗi
-
       - name: Build Windows app
         run: npm run build:win
         env:
