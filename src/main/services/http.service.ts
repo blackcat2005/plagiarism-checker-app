@@ -47,4 +47,8 @@ export class HttpService {
   public getAxiosInstance(): AxiosInstance {
     return this.axiosInstance
   }
+
+  public getToken(): string | null {
+    return this.token
+  }
 }

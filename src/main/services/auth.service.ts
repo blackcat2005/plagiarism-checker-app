@@ -78,7 +78,7 @@ export function setupAuthHandlers() {
 
   ipcMain.handle(IPC_CHANNELS.MAIN.AUTH_LOGOUT, async () => {
     const response = await httpService.getAxiosInstance().post(API_ENDPOINT.AUTH_LOGOUT, {
-      token: authStore.get('accessToken')
+      token: httpService.getToken()
     })
     httpService.setToken(null)
     authStore.set('userId', null)

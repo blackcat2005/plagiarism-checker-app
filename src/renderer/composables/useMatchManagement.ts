@@ -8,6 +8,7 @@ export function useMatchManagement() {
   const reasonText = ref('')
 
   const handleDeleteMatch = (match: MatchSentenceUI) => {
+    console.log('Deleting match:', match)
     selectedMatch.value = match
     showDeleteDialog.value = true
   }
@@ -19,10 +20,12 @@ export function useMatchManagement() {
       match.reasonText = ''
       reasonType.value = undefined
       reasonText.value = ''
+      console.log('Match restored:', match)
     }
   }
 
   const handleEditMatch = (match: MatchSentenceUI) => {
+    console.log('Editing match:', match)
     selectedMatch.value = match
     reasonType.value = match.reasonType
     reasonText.value = match.reasonText || ''
