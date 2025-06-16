@@ -1,0 +1,103 @@
+{
+  "name": "plagiarism-checker-app",
+  "appId": "plagiarism-checker-app",
+  "productName": "Plagiarism Checker App",
+  "description": "A desktop application for checking plagiarism in documents.",
+  "author": "blackcat2005",
+  "version": "1.0.0",
+  "main": "dist/main/index.js",
+  "private": true,
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://localhost:5173"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:debug": "vite -d",
+    "dev:debug:force": "vite -d --force",
+    "build": "npm run build:pre && electron-builder --config=buildAssets/builder/config.js",
+    "build:pre": "npm run format:fix && vue-tsc --noEmit && vite build",
+    "build:all": "npm run build:pre && electron-builder --config=buildAssets/builder/config.js -wml",
+    "build:dir": "npm run build:pre && electron-builder --config=buildAssets/builder/config.js --dir",
+    "build:mac": "npm run build:pre && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config=buildAssets/builder/config.js --mac",
+    "build:linux": "npm run build:pre && electron-builder --config=buildAssets/builder/config.js --linux",
+    "build:win": "vite build && electron-builder --config=buildAssets/builder/config.js --windows",
+    "lint": "eslint . --ext .js,.ts,.vue src",
+    "lint:fix": "eslint . --ext .js,.ts,.vue --fix src",
+    "format": "prettier .",
+    "format:fix": "prettier . --write",
+    "test": "npm run build:pre && playwright test",
+    "test:linux": "npm run build:pre && xvfb-run --auto-servernum --server-args='-screen 0, 1280x960x24' -- playwright test",
+    "postinstall": "electron-rebuild"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
+    "annotpdf": "^1.0.15",
+    "better-sqlite3": "^11.10.0",
+    "keytar": "^7.9.0",
+    "path": "^0.12.7",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "4.9.124",
+    "pinia": "^3.0.2",
+    "promise-worker": "^2.0.1",
+    "sockjs-client": "^1.6.1",
+    "vue": "^3.5.13",
+    "vue-i18n": "^11.1.3",
+    "vue-router": "^4.5.1",
+    "worker-loader": "^3.0.8"
+  },
+  "devDependencies": {
+    "@digital-blueprint/annotpdf": "^1.0.13-a",
+    "@electron/rebuild": "^4.0.1",
+    "@eslint/js": "^9.25.1",
+    "@mdi/js": "^7.4.47",
+    "@playwright/test": "^1.52.0",
+    "@primeuix/themes": "^1.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vitejs/plugin-vue-jsx": "^4.1.2",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "echarts": "^5.6.0",
+    "electron": "^36.1.0",
+    "electron-builder": "^26.0.14",
+    "electron-extension-installer": "^1.2.0",
+    "electron-store": "^10.0.1",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.17.0",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-vue": "^10.1.0",
+    "fast-base64": "^0.1.8",
+    "globals": "^16.0.0",
+    "jiti": "^2.4.2",
+    "lodash": "^4.17.21",
+    "playwright": "^1.52.0",
+    "prettier": "^3.5.3",
+    "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.3.4",
+    "tree-kill": "^1.2.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1",
+    "vite": "^6.3.4",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6",
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vue-echarts": "^7.0.3",
+    "vue-eslint-parser": "^10.1.3",
+    "vue-tsc": "^2.2.10"
+  },
+  "overrides": {
+    "vite-plugin-electron": {
+      "electron": "$electron"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <!-- Magnifying glass handle -->
+  <path d="M38,38 L48,48" stroke="#2c7be5" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Magnifying glass circle -->
+  <circle cx="25" cy="25" r="15" fill="none" stroke="#2c7be5" stroke-width="4"/>
+
+  <!-- Document in background -->
+  <rect x="18" y="18" width="14" height="18" fill="#f0f7ff" rx="1" ry="1"/>
+
+  <!-- Document lines -->
+  <line x1="21" y1="22" x2="29" y2="22" stroke="#a1c6f7" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="21" y1="26" x2="29" y2="26" stroke="#a1c6f7" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="21" y1="30" x2="27" y2="30" stroke="#a1c6f7" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Check mark -->
+  <path d="M23,34 L26,37 L33,30" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

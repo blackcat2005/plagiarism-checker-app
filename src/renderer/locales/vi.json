@@ -1,0 +1,18 @@
+{
+  "toolbar": {
+    "history": "Lượt kiểm tra",
+    "settings": "Cài đặt",
+    "help": "Trợ giúp",
+    "darkMode": "Chế độ tối"
+  },
+  "settings": {
+    "title": "Tài khoản",
+    "profile": {
+      "title": "Thông tin cá nhân",
+      "username": "Tên đăng nhập",
+      "email": "Email",
+      "role": "Vai trò",
+      "logout": "Đăng xuất"
+    }
+  }
+}
