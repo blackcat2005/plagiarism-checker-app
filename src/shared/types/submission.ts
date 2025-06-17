@@ -33,6 +33,9 @@ export type MatchedSentence = {
   docId: number
   text: string
   similarity: number
+  isDeleted?: boolean
+  reasonType?: ReasonType
+  reasonText?: string
 }
 
 export type ComparisonData = {

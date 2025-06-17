@@ -12,7 +12,13 @@
     </PageHeader>
     <div class="p-4 surface-100 border-round">
       <!-- Results Table -->
-      <DataTable :value="submissions" :paginator="true" :rows="10">
+      <DataTable
+        :value="submissions"
+        :paginator="true"
+        :rows="10"
+        sort-field="submissionId"
+        :sort-order="-1"
+      >
         <Column field="submissionId" header="Id" />
         <Column field="submissionName" header="Tên lượt kiểm tra" />
         <Column field="submissionType" header="Dạng kiểm tra">
@@ -27,7 +33,7 @@
             </Tag>
           </template>
         </Column>
-        <Column field="actions" header="">
+        <Column field="actions" header="Hành động">
           <template #body="slotProps">
             <div class="flex gap-2">
               <Button
@@ -35,6 +41,7 @@
                 icon="pi pi-eye"
                 text
                 @click="viewDetails(slotProps.data)"
+                v-p-tooltip.bottom="'Xem chi tiết'"
               />
               <Button
                 v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED"
@@ -42,13 +49,15 @@
                 text
                 severity="warning"
                 @click="editSubmission(slotProps.data)"
+                v-p-tooltip.bottom="'Chỉnh sửa lượt kiểm tra'"
               />
               <Button
                 v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED"
                 icon="pi pi-trash"
-                text
                 severity="danger"
+                text
                 @click="deleteSubmission(slotProps.data)"
+                v-p-tooltip.bottom="'Xoá lượt kiểm tra'"
               />
             </div>
           </template>
@@ -81,6 +90,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
+import Tooltip from 'primevue/tooltip'
 
 const submissionStore = useSubmissionStore()
 const router = useRouter()
@@ -161,9 +171,14 @@ const deleteSubmission = async (data) => {
       toast.add({
         severity: 'success',
         summary: 'Thành công',
-        detail: 'Đã xóa lượt kiểm tra'
+        detail: 'Đã xóa lượt kiểm tra',
+        life: 3000
       })
-    }
+    },
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Xoá',
+    rejectLabel: 'Huỷ',
+    acceptClass: 'p-button-danger'
   })
 }
 

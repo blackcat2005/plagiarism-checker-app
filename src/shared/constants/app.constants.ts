@@ -13,7 +13,7 @@ export const ROUTES = {
 } as const
 
 export const API_ENDPOINT = {
-  BASE_URL: 'http://159.223.73.69:8080',
+  BASE_URL: 'http://localhost:8080',
   AUTH_LOGIN: '/api/auth/login',
   AUTH_LOGOUT: '/api/auth/logout',
   REFRESH_TOKEN: '/api/auth/refresh-token',
@@ -22,5 +22,5 @@ export const API_ENDPOINT = {
   SUBMISSION_EDIT: '/api/submission/edit',
   SUBMISSION_DELETE: '/api/submission/delete',
   SUBMISSION_GET_RESULT: '/api/submission/get-result',
-  WS_URL: 'http://159.223.73.69:8080/ws'
+  WS_URL: 'http://localhost:8080/ws'
 } as const

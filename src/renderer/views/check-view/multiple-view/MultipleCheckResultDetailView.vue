@@ -43,7 +43,12 @@
           </Column>
           <Column field="action" header="Hành động">
             <template #body="slotProps">
-              <Button label="Xem chi tiết" @click="handleAction(slotProps.data.docId)" />
+              <Button
+                icon="pi pi-eye"
+                text
+                v-p-tooltip.bottom="'Xem chi tiết văn bản'"
+                @click="handleAction(slotProps.data.docId)"
+              />
             </template>
           </Column>
         </DataTable>
@@ -67,6 +72,7 @@ import PageHeader from '@/renderer/components/PageHeader.vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Tooltip from 'primevue/tooltip'
 
 use([GridComponent, BarChart, CanvasRenderer, TooltipComponent])
 
@@ -101,7 +107,8 @@ const click = (params) => {
 }
 
 const handleAction = (docId) => {
-  router.push({ path: ROUTES.CHECK_MULTIPLE, query: { docId, submissionId } })
+  console.log(`Handling action for docId: ${docId} and submissionId: ${submissionId}`)
+  router.push({ path: ROUTES.CHECK_RESULT_PDF_VIEW, query: { docId, submissionId } })
 }
 
 onMounted(async () => {

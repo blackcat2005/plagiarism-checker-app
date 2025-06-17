@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import VuePDF from '@/renderer/components/vue-pdf/VuePDF.vue'
 import HighlightTooltip from '@/renderer/components/HighlightTooltip.vue'
 
@@ -67,7 +67,13 @@ const props = defineProps({
   // eslint-disable-next-line vue/require-default-prop
   updateAnnotation: Function,
   // eslint-disable-next-line vue/require-default-prop
-  updateHighlightCoordinates: Function
+  updateHighlightCoordinates: Function,
+  // eslint-disable-next-line vue/require-default-prop
+  enableSource: Array,
+  similarityThreshold: {
+    type: Number,
+    default: 0.85
+  }
 })
 
 const emit = defineEmits(['delete-match', 'edit-match', 'restore-match'])
@@ -95,14 +101,27 @@ const callback = (e: MouseEvent, sentenceId: number) => {
     return
   }
   const info = props.comparisonData.find((c) => c.sentenceId === sentenceId)
+  if (
+    info.matchedSentences.every(
+      (match) => match.similarity < props.similarityThreshold || !props.enableSource[match.docId]
+    )
+  ) {
+    return
+  }
   tooltipData.value = {
     matchedText: info.text,
-    matches: info.matchedSentences.map((match) => ({
-      similarity: Math.round(match.similarity * 100),
-      sourceName: props.transformedData[match.docId],
-      sourceText: match.text,
-      match: match
-    }))
+    matches: info.matchedSentences
+      .filter(
+        (match) => match.similarity >= props.similarityThreshold && props.enableSource[match.docId]
+      )
+      .map((match) => {
+        return {
+          similarity: Math.round(match.similarity * 100),
+          sourceName: props.transformedData[match.docId],
+          sourceText: match.text,
+          match: match
+        }
+      })
   }
 
   tooltipPosition.value = {
@@ -114,9 +133,33 @@ const callback = (e: MouseEvent, sentenceId: number) => {
 
 const highlightDataInternal = computed(() => {
   if (!props.highlightData || props.highlightData.length === 0) {
-    return []
+    const data = []
+    for (let i = 0; i < totalPages.value; i++) {
+      data.push({ page: i, data: [] })
+    }
+    return data
   }
-  const data = [...props.highlightData]
+  const data = []
+  for (let i = 0; i < props.highlightData.length; i++) {
+    const pageData = props.highlightData[i]
+    console.log('Processing page:', i + 1, 'with highlights:', pageData)
+    const filteredPageData = []
+    for (let j = 0; j < pageData.data.length; j++) {
+      const highlight = pageData.data[j]
+      const compareInfo = props.comparisonData.find((c) => c.sentenceId === highlight.sentenceId)
+      const isValidHighlight = compareInfo?.matchedSentences.some(
+        (match) => match.similarity >= props.similarityThreshold && props.enableSource[match.docId]
+      )
+      if (isValidHighlight) {
+        filteredPageData.push(highlight)
+      }
+    }
+    console.log('Filtered highlights for page:', i + 1, '->', filteredPageData)
+    data.push({
+      page: i,
+      data: filteredPageData
+    })
+  }
   if (totalPages.value > data.length) {
     for (let i = data.length + 1; i <= totalPages.value; i++) {
       data.push({
@@ -125,6 +168,7 @@ const highlightDataInternal = computed(() => {
       })
     }
   }
+  console.log('Processed highlight data:', data)
   return data
 })
 
@@ -197,84 +241,6 @@ onMounted(async () => {
     console.error('Error loading PDF: ', error)
   }
 })
-
-const onHighlight = (value) => {
-  const { matches, textDivs, page } = value
-  const highLightPage = props.highlightData[page - 1]
-  const pdfContent = document.querySelectorAll('.pdf-content')[page - 1]
-  const pdfHeightPx = pdfContent.clientHeight
-  const pdfContentBoundingClientRect = pdfContent.getBoundingClientRect()
-  const pdfHeightPt = viewport.value.height
-  const factor = pdfHeightPt / pdfHeightPx
-
-  matches.forEach((match, index) => {
-    const matchedText = match.str
-    const sentence = highLightPage.data.find((s) => s.text.includes(matchedText))
-    for (let i = match.start.idx; i <= match.end.idx; i++) {
-      const textDiv = textDivs[i]
-      const highlightSpanList = textDiv.querySelectorAll('.highlight.appended')
-      highlightSpanList.forEach((highlightSpan) => {
-        if (
-          highlightSpan &&
-          sentence &&
-          highlightSpan.getBoundingClientRect().width > 0 &&
-          highlightSpan.getBoundingClientRect().height > 0
-        ) {
-          const compareInfo = props.comparisonData.find((c) => c.sentenceId === sentence.sentenceId)
-          if (compareInfo) {
-            const x1 =
-              (-pdfContentBoundingClientRect.left + highlightSpan.getBoundingClientRect().left) *
-              factor
-            const y2 =
-              (pdfHeightPx +
-                pdfContentBoundingClientRect.top -
-                highlightSpan.getBoundingClientRect().top) *
-                factor -
-              0.2
-            const x2 = x1 + highlightSpan.getBoundingClientRect().width * factor
-            const y1 = y2 - highlightSpan.getBoundingClientRect().height * factor + 0.2
-            props.updateHighlightCoordinates(page, sentence.sentenceId, [x1, y1, x2, y2])
-            // Sắp xếp các câu trùng theo độ tương đồng
-            const sortedMatches = [...compareInfo.matchedSentences].sort(
-              (a, b) => b.similarity - a.similarity
-            )
-
-            highlightMap.set(highlightSpan, {
-              sentence: compareInfo,
-              matchedSentences: sortedMatches
-            })
-
-            highlightSpan.addEventListener('click', (e) => {
-              e.stopPropagation() // Ngăn chặn event bubbling
-              // if (tooltipVisible.value == true) {
-              //     tooltipVisible.value = false
-              //     return
-              // } else {
-              //     tooltipVisible.value = true
-              // }
-              const info = highlightMap.get(highlightSpan)
-              tooltipData.value = {
-                matchedText: info.sentence.text,
-                matches: info.matchedSentences.map((match) => ({
-                  similarity: Math.round(match.similarity * 100),
-                  sourceName: props.transformedData[match.docId],
-                  sourceText: match.text,
-                  match: match
-                }))
-              }
-
-              tooltipPosition.value = {
-                x: e.clientX + 2,
-                y: e.clientY + 2
-              }
-              tooltipVisible.value = true
-            })
-          }
-        }
-      })
-    }
-  })
-}
 
 const closeTooltip = () => {
   tooltipVisible.value = false

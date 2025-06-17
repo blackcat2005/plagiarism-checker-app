@@ -16,14 +16,17 @@
       <div class="w-8 relative">
         <div class="pdf-container">
           <PdfViewer
+            :key="pdfViewerKey"
             :file-path="documentPath"
-            :highlightData="Object.values(highlightData)"
+            :highlightData="highlightData"
             :comparisonData="Object.values(comparisonData)"
             ref="pdfRef"
             :transformedData="transformedData"
             @delete-match="onDeleteMatch"
             @edit-match="onEditMatch"
             @restore-match="onRestoreMatch"
+            :enableSource="enabledSources"
+            :similarityThreshold="similarityThreshold"
           />
         </div>
       </div>
@@ -192,7 +195,7 @@ const submissionId = Number(route.query.submissionId as string)
 const submission = submissionStore.getSubmissionById(submissionId)
 
 const documentResult = computed<Result>(() => {
-  if (submission) {
+  if (submission && submission.result && submission.result[Number(docId)]) {
     return submission.result[Number(docId)]
   }
   return []
@@ -203,7 +206,7 @@ const documentSentenceCount = computed(() => {
 })
 
 const transformedData = computed<Record<string, string>>(() => {
-  if (submission) {
+  if (submission && submission.docIdToFileName) {
     return Object.keys(submission.docIdToFileName).reduce<Record<string, string>>((acc, key) => {
       const fileName = submission.docIdToFileName[key].split('\\').pop()
       acc[key] = fileName ?? ''
@@ -214,7 +217,7 @@ const transformedData = computed<Record<string, string>>(() => {
 })
 
 const documentPath = computed<string>(() => {
-  if (submission) {
+  if (submission && submission.docIdToFileName) {
     return submission.docIdToFileName[Number(docId)] || ''
   }
   return ''
@@ -222,7 +225,7 @@ const documentPath = computed<string>(() => {
 
 const comparisonData = computed<ComparisonData>(() => {
   console.log('comparisonData', documentResult.value.comparisonData)
-  return _.clone(Object.values(documentResult.value.comparisonData || []))
+  return _.clone(documentResult.value.comparisonData || {})
 })
 
 const enabledSources = ref<{ [key: string]: boolean }>({})
@@ -235,21 +238,17 @@ const thresholdOptions = [
 ]
 
 const {
+  matchedSentence,
+  filteredMatches,
+  modifiedPairs,
   showDeleteDialog,
-  selectedMatch,
   reasonType,
   reasonText,
   handleDeleteMatch,
   handleEditMatch,
   handleRestoreMatch,
   saveDeleteReason
-} = useMatchManagement()
-
-const { matchedSentence, matchesDTO, filteredMatches, modifiedPairs } = useComparisonData(
-  comparisonData,
-  enabledSources,
-  similarityThreshold
-)
+} = useComparisonData(comparisonData, enabledSources, similarityThreshold)
 
 const overallSimilarity = computed(() => {
   const totalMatches = matchedSentence.value.size
@@ -286,6 +285,8 @@ const getSourceSimilarityPercentage = (sourceId) => {
   if (!documentResult.value.stats[sourceId]) return 0
   return (documentResult.value.stats[sourceId].percentage * 100).toFixed(2) ?? 0
 }
+
+const pdfViewerKey = ref(0)
 
 onMounted(async () => {
   const docSentences = await window.mainApi.invoke(IPC_CHANNELS.MAIN.GET_SENTENCE, Number(docId))
@@ -333,17 +334,67 @@ onMounted(async () => {
   }
 })
 
-// function stringToUtf16Raw(text) {
-//   let out = []
-//   out.push(String.fromCharCode(254))
-//   out.push(String.fromCharCode(255))
-//   for (let c of text) {
-//     c = c.charCodeAt(0)
-//     out.push(String.fromCharCode(c >> 8))
-//     out.push(String.fromCharCode(c & 0xff))
-//   }
-//   return out.join('')
-// }
+// Add watch for threshold and sources changes
+watch(
+  [similarityThreshold, enabledSources],
+  async () => {
+    // Reset highlight data
+    highlightData.value = []
+
+    // Get sentences again and rebuild highlight data
+    const docSentences = await window.mainApi.invoke(IPC_CHANNELS.MAIN.GET_SENTENCE, Number(docId))
+
+    for (const sentence of docSentences) {
+      let pages = JSON.parse(sentence.page)
+      let lastPage = pages[pages.length - 1]
+      let id = sentence.id_in_doc
+      let split = sentence.split
+      let text = sentence.text
+
+      if (highlightData.value.length < lastPage) {
+        highlightData.value.push({
+          page: lastPage,
+          data: []
+        })
+      }
+
+      const foundCompareData = Object.values(comparisonData.value).find((c) => c.sentenceId === id)
+      if (!foundCompareData) {
+        continue
+      }
+
+      // Check if any matched sentence satisfies the conditions
+      const hasValidMatch = foundCompareData.matchedSentences.some((match) => {
+        // Check if source is enabled and similarity meets threshold
+        return enabledSources.value[match.docId] && match.similarity >= similarityThreshold.value
+      })
+
+      // Only add highlight if there is at least one valid match
+      if (hasValidMatch) {
+        if (split === -1) {
+          highlightData.value[lastPage - 1].data.push({
+            sentenceId: id,
+            text
+          })
+        } else {
+          highlightData.value[lastPage - 1].data.push({
+            sentenceId: id,
+            text: text.slice(split)
+          })
+
+          highlightData.value[lastPage - 2].data.push({
+            sentenceId: id,
+            text: text.slice(0, split)
+          })
+        }
+      }
+    }
+
+    // Force reload PdfViewer by changing its key
+    pdfViewerKey.value++
+  },
+  { deep: true }
+)
 
 const print = async () => {
   // const pdfContent = document.querySelector('.pdf-content')
@@ -367,17 +418,16 @@ const print = async () => {
   //     const compareItem = comparisonData.value.find((c) => c.sentenceId === item.sentenceId)
   //     if (!compareItem) continue
   //     const matchedSentences = compareItem.matchedSentences
-  //     const content = matchedSentences
   //       .map((match) => {
   //         if (match.isDeleted) return ''
   //         return `${transformedData[match.docId]}: ${match.text}\n`
   //       })
   //       .join('\n')
-  //     if ([...content].every((char) => char === '\n')) continue
+  //     if ([...matchedSentences].every((char) => char === '\n')) continue
   //     for (const coordinate of item.coordinates) {
   //       pdfFactory.value.createHighlightAnnotation({
   //         page: page - 1,
-  //         contents: stringToUtf16Raw(content),
+  //         contents: stringToUtf16Raw(matchedSentences),
   //         font: 'Times-Roman',
   //         rect: [...coordinate],
   //         author: 'plagiarism checker',
@@ -421,8 +471,7 @@ const print = async () => {
     IPC_CHANNELS.MAIN.HIGHLIGHT,
     documentPathToSend,
     _.cloneDeep(highlightDataToSend),
-    _.cloneDeep(comparisonData.value),
-    _.cloneDeep(transformedData.value)
+    _.cloneDeep(comparisonData.value)
   )
 }
 

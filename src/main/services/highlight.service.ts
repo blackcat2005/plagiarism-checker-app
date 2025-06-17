@@ -13,7 +13,12 @@ export default class HighlightService {
   static initialize(): void {
     // Initialize highlight service
     ipcMain.on(IPC_CHANNELS.MAIN.HIGHLIGHT, async (event, filePath, highlightData) => {
-      await highlightPDFWithAdvancedSearch(filePath, highlightData, {
+      const outputPath = await dialog.showSaveDialog({
+        title: 'Save Highlighted PDF',
+        defaultPath: filePath.replace(/\.pdf$/, '_highlighted.pdf'),
+        filters: [{ name: 'PDF Files', extensions: ['pdf'] }]
+      })
+      await highlightPDFWithAdvancedSearch(filePath, outputPath.filePath, highlightData, {
         ignoreCase: true,
         completeWords: false
       })
@@ -130,6 +135,7 @@ function convertMatchToTextItems(regexMatch: RegExpExecArray, textItems: TextIte
 // Main highlight function
 export async function highlightPDFWithAdvancedSearch(
   inputPath: string,
+  outputPath: string,
   highlightData: HighlightData[],
   options: HighlightOptions = { ignoreCase: true }
 ) {
@@ -144,7 +150,6 @@ export async function highlightPDFWithAdvancedSearch(
   const pdfjs = await PDFJS.getDocument({ data: pdfBase64 }).promise
   const pdfDoc = await PDFDocument.load(pdfBytes)
 
-  console.log('total', pdfjs.numPages)
   for (let pageNum = 1; pageNum <= pdfjs.numPages; pageNum++) {
     const page = await pdfjs.getPage(pageNum)
     const viewport = page.getViewport({ scale: 1 })
@@ -174,6 +179,10 @@ export async function highlightPDFWithAdvancedSearch(
       }
     }
   }
+
+  const pdfBytesHighlighted = await pdfDoc.save()
+  const buffer = Buffer.from(pdfBytesHighlighted)
+  fs.writeFileSync(outputPath, buffer)
 }
 
 function calculateBoundingBoxes(match: Match, textItems: TextItem[], pageHeight: number) {
