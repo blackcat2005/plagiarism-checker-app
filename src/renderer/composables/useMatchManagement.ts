@@ -19,33 +19,34 @@ export function useMatchManagement() {
       match.reasonText = ''
       reasonType.value = undefined
       reasonText.value = ''
-  }
-
-  const handleEditMatch = (match: MatchSentenceUI) => {
-    selectedMatch.value = match
-    reasonType.value = match.reasonType
-    reasonText.value = match.reasonText || ''
-    showDeleteDialog.value = true
-  }
-
-  const saveDeleteReason = () => {
-    if (selectedMatch.value) {
-      selectedMatch.value.isDeleted = true
-      selectedMatch.value.reasonType = reasonType.value
-      selectedMatch.value.reasonText = reasonText.value
     }
-    showDeleteDialog.value = false
-    reasonText.value = ''
-  }
 
-  return {
-    showDeleteDialog,
-    selectedMatch,
-    reasonType,
-    reasonText,
-    handleDeleteMatch,
-    handleEditMatch,
-    handleRestoreMatch,
-    saveDeleteReason
+    const handleEditMatch = (match: MatchSentenceUI) => {
+      selectedMatch.value = match
+      reasonType.value = match.reasonType
+      reasonText.value = match.reasonText || ''
+      showDeleteDialog.value = true
+    }
+
+    const saveDeleteReason = () => {
+      if (selectedMatch.value) {
+        selectedMatch.value.isDeleted = true
+        selectedMatch.value.reasonType = reasonType.value
+        selectedMatch.value.reasonText = reasonText.value
+      }
+      showDeleteDialog.value = false
+      reasonText.value = ''
+    }
+
+    return {
+      showDeleteDialog,
+      selectedMatch,
+      reasonType,
+      reasonText,
+      handleDeleteMatch,
+      handleEditMatch,
+      handleRestoreMatch,
+      saveDeleteReason
+    }
   }
 }
