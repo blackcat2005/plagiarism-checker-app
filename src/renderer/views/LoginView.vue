@@ -4,22 +4,44 @@
     <div class="w-30rem flex flex-column align-items-start justify-content-center">
       <div class="w-full surface-card sm:px-10">
         <div class="text-center mb-6">
-          <img src="@/public/images/logo.svg" alt="Logo" class="mb-4" style="width: 120px; height: auto" />
+          <img
+            src="@/public/images/logo.svg"
+            alt="Logo"
+            class="mb-4"
+            style="width: 120px; height: auto"
+          />
           <div class="text-900 text-3xl font-medium mb-2"> Đăng nhập </div>
         </div>
 
         <div class="px-2">
           <div class="flex flex-column gap-3 mb-4">
-            <InputText id="username" v-model="username" type="text" class="w-full p-3" placeholder="Username" />
+            <InputText
+              id="username"
+              v-model="username"
+              type="text"
+              class="w-full p-3"
+              placeholder="Username"
+            />
           </div>
 
           <div class="flex flex-column gap-3 mb-5">
-            <Password id="password" v-model="password" class="w-full" :feedback="false" :toggle-mask="true"
-              placeholder="Password" inputClass="w-full p-3" />
+            <Password
+              id="password"
+              v-model="password"
+              class="w-full"
+              :feedback="false"
+              :toggle-mask="true"
+              placeholder="Password"
+              inputClass="w-full p-3"
+            />
           </div>
 
-          <Button :label="loading ? 'Đang đăng nhập...' : 'Đăng nhập'" class="w-full p-3 text-xl" @click="handleLogin"
-            :loading="loading" />
+          <Button
+            :label="loading ? 'Đang đăng nhập...' : 'Đăng nhập'"
+            class="w-full p-3 text-xl"
+            @click="handleLogin"
+            :loading="loading"
+          />
         </div>
       </div>
     </div>

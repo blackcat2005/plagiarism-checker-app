@@ -1,7 +1,9 @@
 <template>
   <div class="px-3">
-    <PageHeader :title="`Chi tiết kết quả của ${transformedData[docId]} trong lượt kiểm tra ${submissionName}`"
-      @back="router.back">
+    <PageHeader
+      :title="`Chi tiết kết quả của ${transformedData[docId]} trong lượt kiểm tra ${submissionName}`"
+      @back="router.back"
+    >
       <template #actions>
         <!-- Action Buttons -->
         <div class="p-2 flex gap-2 border-bottom-1 surface-border">
@@ -13,10 +15,18 @@
       <!-- PDF Viewer Panel -->
       <div class="w-8 relative">
         <div class="pdf-container">
-          <PdfViewer :file-path="documentPath" :highlightData="highlightData"
-            :comparisonData="Object.values(comparisonData)" ref="pdfRef" :transformedData="transformedData"
-            @delete-match="onDeleteMatch" @edit-match="onEditMatch" @restore-match="onRestoreMatch"
-            :enableSource="enabledSources" :similarityThreshold="similarityThreshold" />
+          <PdfViewer
+            :file-path="documentPath"
+            :highlightData="highlightData"
+            :comparisonData="Object.values(comparisonData)"
+            ref="pdfRef"
+            :transformedData="transformedData"
+            @delete-match="onDeleteMatch"
+            @edit-match="onEditMatch"
+            @restore-match="onRestoreMatch"
+            :enableSource="enabledSources"
+            :similarityThreshold="similarityThreshold"
+          />
         </div>
       </div>
 
@@ -46,28 +56,44 @@
             <h3 class="m-0 text-lg">Ngưỡng độ tương đồng</h3>
             <span class="text-500">{{ (similarityThreshold * 100).toFixed(0) }}%</span>
           </div>
-          <Dropdown v-model="similarityThreshold" :options="thresholdOptions" optionLabel="label" optionValue="value"
-            class="w-full" />
+          <Dropdown
+            v-model="similarityThreshold"
+            :options="thresholdOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+          />
         </div>
 
         <!-- Modified Pairs Section -->
         <div class="p-3 surface-section border-round m-2 border-1 surface-border">
           <div class="flex align-items-center justify-content-between mb-3">
             <h3 class="m-0 text-lg">Các cặp đã thay đổi</h3>
-            <Button icon="pi pi-chevron-down" class="p-button-text p-button-rounded"
-              @click="toggleSection('modifiedPairs')" />
+            <Button
+              icon="pi pi-chevron-down"
+              class="p-button-text p-button-rounded"
+              @click="toggleSection('modifiedPairs')"
+            />
           </div>
           <div v-show="expandedSections.modifiedPairs" class="modified-pairs-list">
             <div v-for="sentence in modifiedPairs" :key="sentence.sentenceId">
               <div class="flex align-items-center justify-content-between mb-3">
                 <div class="source-name font-bold">{{ transformedData[sentence.docId] }}</div>
                 <div class="flex gap-2">
-                  <Tag :value="getReasonConfig(sentence.reasonType).label"
-                    :severity="getReasonConfig(sentence.reasonType).severity" />
-                  <Button icon="pi pi-pencil" class="p-button-text p-button-rounded p-button-warning"
-                    @click="handleEditMatch(sentence)" />
-                  <Button icon="pi pi-undo" class="p-button-text p-button-rounded p-button-success"
-                    @click="handleRestoreMatch(sentence)" />
+                  <Tag
+                    :value="getReasonConfig(sentence.reasonType).label"
+                    :severity="getReasonConfig(sentence.reasonType).severity"
+                  />
+                  <Button
+                    icon="pi pi-pencil"
+                    class="p-button-text p-button-rounded p-button-warning"
+                    @click="handleEditMatch(sentence)"
+                  />
+                  <Button
+                    icon="pi pi-undo"
+                    class="p-button-text p-button-rounded p-button-success"
+                    @click="handleRestoreMatch(sentence)"
+                  />
                 </div>
               </div>
               <div class="text-sm text-500 mb-3 p-2 surface-100 border-round">
@@ -90,12 +116,18 @@
         <div class="p-3 surface-section border-round m-2 border-1 surface-border">
           <div class="flex align-items-center justify-content-between mb-3">
             <h3 class="m-0 text-lg">Các nguồn khác</h3>
-            <Button icon="pi pi-chevron-down" class="p-button-text p-button-rounded"
-              @click="toggleSection('sources')" />
+            <Button
+              icon="pi pi-chevron-down"
+              class="p-button-text p-button-rounded"
+              @click="toggleSection('sources')"
+            />
           </div>
           <div v-show="expandedSections.sources" class="sources-list">
-            <div v-for="id in Object.keys(enabledSources)" :key="id"
-              class="source-item p-2 border-1 surface-border border-round mb-2">
+            <div
+              v-for="id in Object.keys(enabledSources)"
+              :key="id"
+              class="source-item p-2 border-1 surface-border border-round mb-2"
+            >
               <div class="flex align-items-center gap-2 mb-2">
                 <Checkbox v-model="enabledSources[id]" :binary="true" :inputId="'source-' + id" />
                 <label :for="'source-' + id" class="font-medium">{{ transformedData[id] }}</label>
@@ -116,8 +148,13 @@
       </div>
     </div>
 
-    <DeleteReasonDialog v-model:visible="showDeleteDialog" v-model:reasonType="reasonType"
-      v-model:reasonText="reasonText" @save="saveDeleteReason" @cancel="showDeleteDialog = false" />
+    <DeleteReasonDialog
+      v-model:visible="showDeleteDialog"
+      v-model:reasonType="reasonType"
+      v-model:reasonText="reasonText"
+      @save="saveDeleteReason"
+      @cancel="showDeleteDialog = false"
+    />
     <Toast />
   </div>
 </template>

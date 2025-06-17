@@ -233,8 +233,11 @@ defineExpose({
 <template>
   <div ref="container" style="position: relative; display: block">
     <canvas dir="ltr" style="display: block" role="main" />
-    <TextLayer v-bind="{ page: props.page, ...internalProps, ...tlayerProps }" @highlight="emit('highlight', $event)"
-      @text-loaded="emit('textLoaded', $event)" />
+    <TextLayer
+      v-bind="{ page: props.page, ...internalProps, ...tlayerProps }"
+      @highlight="emit('highlight', $event)"
+      @text-loaded="emit('textLoaded', $event)"
+    />
     <div v-show="loading" ref="loadingLayer" style="position: absolute">
       <slot />
     </div>

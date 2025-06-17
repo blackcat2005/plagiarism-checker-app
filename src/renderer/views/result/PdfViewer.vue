@@ -1,15 +1,27 @@
 <template>
   <div class="pdf-viewer-container">
     <div class="pages-container" ref="pagesContainer">
-      <div v-for="page in totalPages" :key="page" :data-page="page" class="page-container" v-intersection-observer="{
-        callback: handleIntersection,
-        threshold: 0.5,
-        once: true
-      }">
+      <div
+        v-for="page in totalPages"
+        :key="page"
+        :data-page="page"
+        class="page-container"
+        v-intersection-observer="{
+          callback: handleIntersection,
+          threshold: 0.5,
+          once: true
+        }"
+      >
         <div v-if="pageLoadingStates.get(page)" class="load"> Loading page {{ page }}... </div>
         <template v-else-if="loadedPages.has(page)">
-          <VuePDF :page="loadedPages.get(page)" :scale="1" :highlight-data="highlightDataInternal[page - 1].data"
-            :highlight-options="highlightOptions" :highlight-call-back="callback" class="pdf-content" />
+          <VuePDF
+            :page="loadedPages.get(page)"
+            :scale="1"
+            :highlight-data="highlightDataInternal[page - 1].data"
+            :highlight-options="highlightOptions"
+            :highlight-call-back="callback"
+            class="pdf-content"
+          />
         </template>
         <div v-else-if="pageErrors.get(page)" class="error">
           Error loading page {{ page }}: {{ pageErrors.get(page) }}
@@ -17,8 +29,15 @@
         <div v-else class="load"> Page {{ page }} - Scroll to load </div>
       </div>
     </div>
-    <HighlightTooltip :visible="tooltipVisible" :data="tooltipData" :position="tooltipPosition" @close="closeTooltip"
-      @delete="handleDeleteMatch" @edit="handleEditMatch" @restore="handleRestoreMatch" />
+    <HighlightTooltip
+      :visible="tooltipVisible"
+      :data="tooltipData"
+      :position="tooltipPosition"
+      @close="closeTooltip"
+      @delete="handleDeleteMatch"
+      @edit="handleEditMatch"
+      @restore="handleRestoreMatch"
+    />
   </div>
 </template>
 

@@ -2,12 +2,23 @@
   <div class="px-5">
     <PageHeader title="Các lượt kiểm tra" :show-back-button="false">
       <template #actions>
-        <Button v-if="canStartNewCheck" icon="pi pi-plus" label="Kiểm tra mới" @click="navigateToCheck" />
+        <Button
+          v-if="canStartNewCheck"
+          icon="pi pi-plus"
+          label="Kiểm tra mới"
+          @click="navigateToCheck"
+        />
       </template>
     </PageHeader>
     <div class="p-4 surface-100 border-round">
       <!-- Results Table -->
-      <DataTable :value="submissions" :paginator="true" :rows="10" sort-field="submissionId" :sort-order="-1">
+      <DataTable
+        :value="submissions"
+        :paginator="true"
+        :rows="10"
+        sort-field="submissionId"
+        :sort-order="-1"
+      >
         <Column field="submissionId" header="Id" />
         <Column field="submissionName" header="Tên lượt kiểm tra" />
         <Column field="submissionType" header="Dạng kiểm tra">
@@ -25,13 +36,29 @@
         <Column field="actions" header="Hành động">
           <template #body="slotProps">
             <div class="flex gap-2">
-              <Button v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED" icon="pi pi-eye" text
-                @click="viewDetails(slotProps.data)" v-p-tooltip.bottom="'Xem chi tiết'" />
-              <Button v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED" icon="pi pi-plus-circle" text
-                severity="warning" @click="editSubmission(slotProps.data)"
-                v-p-tooltip.bottom="'Chỉnh sửa lượt kiểm tra'" />
-              <Button v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED" icon="pi pi-trash" severity="danger"
-                text @click="deleteSubmission(slotProps.data)" v-p-tooltip.bottom="'Xoá lượt kiểm tra'" />
+              <Button
+                v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED"
+                icon="pi pi-eye"
+                text
+                @click="viewDetails(slotProps.data)"
+                v-p-tooltip.bottom="'Xem chi tiết'"
+              />
+              <Button
+                v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED"
+                icon="pi pi-plus-circle"
+                text
+                severity="warning"
+                @click="editSubmission(slotProps.data)"
+                v-p-tooltip.bottom="'Chỉnh sửa lượt kiểm tra'"
+              />
+              <Button
+                v-if="slotProps.data.status === SUBMISSION_STATUS.COMPLETED"
+                icon="pi pi-trash"
+                severity="danger"
+                text
+                @click="deleteSubmission(slotProps.data)"
+                v-p-tooltip.bottom="'Xoá lượt kiểm tra'"
+              />
             </div>
           </template>
         </Column>
