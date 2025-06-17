@@ -50,6 +50,7 @@
 import { computed } from 'vue'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
+import { onMounted } from 'vue'
 
 const props = defineProps({
   visible: Boolean,
@@ -89,6 +90,10 @@ const getReasonSeverity = (reasonType) => {
       return 'info'
   }
 }
+
+onMounted(() => {
+  console.log(props.data)
+})
 </script>
 
 <style scoped>

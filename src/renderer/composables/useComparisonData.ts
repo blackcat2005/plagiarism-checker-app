@@ -78,19 +78,25 @@ export function useComparisonData(
   }
 
   const handleRestoreMatch = (match: MatchSentenceUI) => {
-    comparisonData.value[match.sourceSentenceId].matchedSentences = comparisonData.value[
-      match.sourceSentenceId
-    ].matchedSentences.map((m) => {
-      if (m.sentenceId === match.sentenceId && m.docId === match.docId) {
-        return {
-          ...m,
-          isDeleted: false,
-          reasonType: undefined,
-          reasonText: ''
+    if (match.sourceSentenceId) {
+      comparisonData.value[match.sourceSentenceId].matchedSentences = comparisonData.value[
+        match.sourceSentenceId
+      ].matchedSentences.map((m) => {
+        if (m.sentenceId === match.sentenceId && m.docId === match.docId) {
+          return {
+            ...m,
+            isDeleted: false,
+            reasonType: undefined,
+            reasonText: ''
+          }
         }
-      }
-      return m
-    })
+        return m
+      })
+    } else {
+      match.isDeleted = false
+      match.reasonType = undefined
+      match.reasonText = ''
+    }
   }
 
   const handleEditMatch = (match: MatchSentenceUI) => {
@@ -98,23 +104,30 @@ export function useComparisonData(
     reasonType.value = match.reasonType
     reasonText.value = match.reasonText || ''
     showDeleteDialog.value = true
-    comparisonData.value[match.sourceSentenceId].matchedSentences = comparisonData.value[
-      match.sourceSentenceId
-    ].matchedSentences.map((m) => {
-      if (m.sentenceId === match.sentenceId && m.docId === match.docId) {
-        return {
-          ...m,
-          isDeleted: true,
-          reasonType: match.reasonType,
-          reasonText: match.reasonText || ''
+    if (match.sourceSentenceId) {
+      comparisonData.value[match.sourceSentenceId].matchedSentences = comparisonData.value[
+        match.sourceSentenceId
+      ].matchedSentences.map((m) => {
+        if (m.sentenceId === match.sentenceId && m.docId === match.docId) {
+          return {
+            ...m,
+            isDeleted: true,
+            reasonType: match.reasonType,
+            reasonText: match.reasonText || ''
+          }
         }
-      }
-      return m
-    })
+        return m
+      })
+    } else {
+      selectedMatch.value.isDeleted = true
+      selectedMatch.value.reasonType = match.reasonType
+      selectedMatch.value.reasonText = match.reasonText || ''
+    }
   }
 
   const saveDeleteReason = () => {
-    if (selectedMatch.value) {
+    console.log('selectedMatch.value', selectedMatch.value)
+    if (selectedMatch.value && selectedMatch.value.sourceSentenceId) {
       comparisonData.value[selectedMatch.value.sourceSentenceId].matchedSentences =
         comparisonData.value[selectedMatch.value.sourceSentenceId].matchedSentences.map((m) => {
           if (
@@ -130,6 +143,10 @@ export function useComparisonData(
           }
           return m
         })
+    } else if (selectedMatch.value) {
+      selectedMatch.value.isDeleted = true
+      selectedMatch.value.reasonType = reasonType.value
+      selectedMatch.value.reasonText = reasonText.value
     }
     showDeleteDialog.value = false
     reasonText.value = ''

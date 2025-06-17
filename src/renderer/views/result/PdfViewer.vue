@@ -69,7 +69,7 @@ const props = defineProps({
   // eslint-disable-next-line vue/require-default-prop
   updateHighlightCoordinates: Function,
   // eslint-disable-next-line vue/require-default-prop
-  enableSource: Array,
+  enableSource: Object,
   similarityThreshold: {
     type: Number,
     default: 0.85
@@ -121,7 +121,7 @@ const callback = (e: MouseEvent, sentenceId: number) => {
         }
       })
   }
-
+  console.log('tooltipData.value', tooltipData.value)
   tooltipPosition.value = {
     x: e.clientX + 2,
     y: e.clientY + 2
