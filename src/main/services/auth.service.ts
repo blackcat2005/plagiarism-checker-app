@@ -16,13 +16,11 @@ export async function autoLogin() {
   const userName = authStore.get('userName')
   const userId = authStore.get('userId')
   const refreshToken = await keytar.getPassword(BrowserConstants.APP_NAME, userName)
-  console.log('refreshToken ', refreshToken)
   if (refreshToken) {
     try {
       const response = await HttpService.getInstance()
         .getAxiosInstance()
         .post<RefreshResponse>(API_ENDPOINT.REFRESH_TOKEN, { refreshToken })
-      console.log(response)
       if (response.data.code === 2000) {
         const accessToken = response.data.result.accessToken
         HttpService.getInstance().setToken(accessToken)

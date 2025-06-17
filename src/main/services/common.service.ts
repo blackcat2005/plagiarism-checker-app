@@ -30,7 +30,6 @@ export default class CommonService {
 
     ipcMain.on(IPC_CHANNELS.MAIN.MAXIMIZE_WINDOW, async (event: IpcMainEvent) => {
       const window = BrowserWindow.getFocusedWindow()
-      console.log('maximize window', window)
       if (window) {
         if (window.isMaximized()) {
           window.unmaximize()

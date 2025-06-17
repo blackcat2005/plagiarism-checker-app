@@ -19,7 +19,6 @@ window.mainApi.on(
 
 // Handle auto login success
 window.mainApi.on(IPC_CHANNELS.RENDERER.AUTO_LOGIN_SUCCESS, async (_, user: User) => {
-  console.log('Auto login success:', user)
   authStore.login(user)
   await authStore.loadSubmissions()
   router.push({ path: ROUTES.CHECK })

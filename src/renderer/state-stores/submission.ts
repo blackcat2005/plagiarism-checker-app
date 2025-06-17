@@ -48,7 +48,6 @@ export const useSubmissionStore = defineStore('submission', {
         submissionId
       )
       if (result) {
-        console.log(result)
         if (this.submissions.has(submissionId)) {
           const submission = this.submissions.get(submissionId)
           if (submission) {

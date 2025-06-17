@@ -1,9 +1,7 @@
 <template>
   <div class="px-3">
-    <PageHeader
-      :title="`Chi tiết kết quả của ${transformedData[docId]} trong lượt kiểm tra ${submissionName}`"
-      @back="router.back"
-    >
+    <PageHeader :title="`Chi tiết kết quả của ${transformedData[docId]} trong lượt kiểm tra ${submissionName}`"
+      @back="router.back">
       <template #actions>
         <!-- Action Buttons -->
         <div class="p-2 flex gap-2 border-bottom-1 surface-border">
@@ -15,19 +13,10 @@
       <!-- PDF Viewer Panel -->
       <div class="w-8 relative">
         <div class="pdf-container">
-          <PdfViewer
-            :key="pdfViewerKey"
-            :file-path="documentPath"
-            :highlightData="highlightData"
-            :comparisonData="Object.values(comparisonData)"
-            ref="pdfRef"
-            :transformedData="transformedData"
-            @delete-match="onDeleteMatch"
-            @edit-match="onEditMatch"
-            @restore-match="onRestoreMatch"
-            :enableSource="enabledSources"
-            :similarityThreshold="similarityThreshold"
-          />
+          <PdfViewer :file-path="documentPath" :highlightData="highlightData"
+            :comparisonData="Object.values(comparisonData)" ref="pdfRef" :transformedData="transformedData"
+            @delete-match="onDeleteMatch" @edit-match="onEditMatch" @restore-match="onRestoreMatch"
+            :enableSource="enabledSources" :similarityThreshold="similarityThreshold" />
         </div>
       </div>
 
@@ -57,44 +46,28 @@
             <h3 class="m-0 text-lg">Ngưỡng độ tương đồng</h3>
             <span class="text-500">{{ (similarityThreshold * 100).toFixed(0) }}%</span>
           </div>
-          <Dropdown
-            v-model="similarityThreshold"
-            :options="thresholdOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-          />
+          <Dropdown v-model="similarityThreshold" :options="thresholdOptions" optionLabel="label" optionValue="value"
+            class="w-full" />
         </div>
 
         <!-- Modified Pairs Section -->
         <div class="p-3 surface-section border-round m-2 border-1 surface-border">
           <div class="flex align-items-center justify-content-between mb-3">
             <h3 class="m-0 text-lg">Các cặp đã thay đổi</h3>
-            <Button
-              icon="pi pi-chevron-down"
-              class="p-button-text p-button-rounded"
-              @click="toggleSection('modifiedPairs')"
-            />
+            <Button icon="pi pi-chevron-down" class="p-button-text p-button-rounded"
+              @click="toggleSection('modifiedPairs')" />
           </div>
           <div v-show="expandedSections.modifiedPairs" class="modified-pairs-list">
             <div v-for="sentence in modifiedPairs" :key="sentence.sentenceId">
               <div class="flex align-items-center justify-content-between mb-3">
                 <div class="source-name font-bold">{{ transformedData[sentence.docId] }}</div>
                 <div class="flex gap-2">
-                  <Tag
-                    :value="getReasonConfig(sentence.reasonType).label"
-                    :severity="getReasonConfig(sentence.reasonType).severity"
-                  />
-                  <Button
-                    icon="pi pi-pencil"
-                    class="p-button-text p-button-rounded p-button-warning"
-                    @click="handleEditMatch(sentence)"
-                  />
-                  <Button
-                    icon="pi pi-undo"
-                    class="p-button-text p-button-rounded p-button-success"
-                    @click="handleRestoreMatch(sentence)"
-                  />
+                  <Tag :value="getReasonConfig(sentence.reasonType).label"
+                    :severity="getReasonConfig(sentence.reasonType).severity" />
+                  <Button icon="pi pi-pencil" class="p-button-text p-button-rounded p-button-warning"
+                    @click="handleEditMatch(sentence)" />
+                  <Button icon="pi pi-undo" class="p-button-text p-button-rounded p-button-success"
+                    @click="handleRestoreMatch(sentence)" />
                 </div>
               </div>
               <div class="text-sm text-500 mb-3 p-2 surface-100 border-round">
@@ -117,18 +90,12 @@
         <div class="p-3 surface-section border-round m-2 border-1 surface-border">
           <div class="flex align-items-center justify-content-between mb-3">
             <h3 class="m-0 text-lg">Các nguồn khác</h3>
-            <Button
-              icon="pi pi-chevron-down"
-              class="p-button-text p-button-rounded"
-              @click="toggleSection('sources')"
-            />
+            <Button icon="pi pi-chevron-down" class="p-button-text p-button-rounded"
+              @click="toggleSection('sources')" />
           </div>
           <div v-show="expandedSections.sources" class="sources-list">
-            <div
-              v-for="id in Object.keys(enabledSources)"
-              :key="id"
-              class="source-item p-2 border-1 surface-border border-round mb-2"
-            >
+            <div v-for="id in Object.keys(enabledSources)" :key="id"
+              class="source-item p-2 border-1 surface-border border-round mb-2">
               <div class="flex align-items-center gap-2 mb-2">
                 <Checkbox v-model="enabledSources[id]" :binary="true" :inputId="'source-' + id" />
                 <label :for="'source-' + id" class="font-medium">{{ transformedData[id] }}</label>
@@ -149,13 +116,8 @@
       </div>
     </div>
 
-    <DeleteReasonDialog
-      v-model:visible="showDeleteDialog"
-      v-model:reasonType="reasonType"
-      v-model:reasonText="reasonText"
-      @save="saveDeleteReason"
-      @cancel="showDeleteDialog = false"
-    />
+    <DeleteReasonDialog v-model:visible="showDeleteDialog" v-model:reasonType="reasonType"
+      v-model:reasonText="reasonText" @save="saveDeleteReason" @cancel="showDeleteDialog = false" />
     <Toast />
   </div>
 </template>
@@ -224,7 +186,6 @@ const documentPath = computed<string>(() => {
 })
 
 const comparisonData = computed<ComparisonData>(() => {
-  console.log('comparisonData', documentResult.value.comparisonData)
   return _.clone(documentResult.value.comparisonData || {})
 })
 
@@ -334,144 +295,13 @@ onMounted(async () => {
   }
 })
 
-// Add watch for threshold and sources changes
-watch(
-  [similarityThreshold, enabledSources],
-  async () => {
-    // Reset highlight data
-    highlightData.value = []
-
-    // Get sentences again and rebuild highlight data
-    const docSentences = await window.mainApi.invoke(IPC_CHANNELS.MAIN.GET_SENTENCE, Number(docId))
-
-    for (const sentence of docSentences) {
-      let pages = JSON.parse(sentence.page)
-      let lastPage = pages[pages.length - 1]
-      let id = sentence.id_in_doc
-      let split = sentence.split
-      let text = sentence.text
-
-      if (highlightData.value.length < lastPage) {
-        highlightData.value.push({
-          page: lastPage,
-          data: []
-        })
-      }
-
-      const foundCompareData = Object.values(comparisonData.value).find((c) => c.sentenceId === id)
-      if (!foundCompareData) {
-        continue
-      }
-
-      // Check if any matched sentence satisfies the conditions
-      const hasValidMatch = foundCompareData.matchedSentences.some((match) => {
-        // Check if source is enabled and similarity meets threshold
-        return enabledSources.value[match.docId] && match.similarity >= similarityThreshold.value
-      })
-
-      // Only add highlight if there is at least one valid match
-      if (hasValidMatch) {
-        if (split === -1) {
-          highlightData.value[lastPage - 1].data.push({
-            sentenceId: id,
-            text
-          })
-        } else {
-          highlightData.value[lastPage - 1].data.push({
-            sentenceId: id,
-            text: text.slice(split)
-          })
-
-          highlightData.value[lastPage - 2].data.push({
-            sentenceId: id,
-            text: text.slice(0, split)
-          })
-        }
-      }
-    }
-
-    // Force reload PdfViewer by changing its key
-    pdfViewerKey.value++
-  },
-  { deep: true }
-)
-
 const print = async () => {
-  // const pdfContent = document.querySelector('.pdf-content')
-  // const canvas = await html2canvas(pdfContent)
-  // const canvasData = canvas.toDataURL('image/png')
-  // printJS({
-  //     printable: canvasData,
-  //     type: 'image',
-  //     header: 'PDF with Highlights',
-  //     imageStyle: 'width:100%;',
-  //     documentTitle: 'PDF_with_highlights',
-  //     onPrintDialogClose: function () {
-  //         console.log('Printing completed');
-  //     }
-  // });
-  // pdfFactory.value
-  // const pdf = await AnnotationFactory.loadFile(documentPath)
-  // for (const highlight of highlightData.value) {
-  //   const page = highlight.page
-  //   for (const item of highlight.data) {
-  //     const compareItem = comparisonData.value.find((c) => c.sentenceId === item.sentenceId)
-  //     if (!compareItem) continue
-  //     const matchedSentences = compareItem.matchedSentences
-  //       .map((match) => {
-  //         if (match.isDeleted) return ''
-  //         return `${transformedData[match.docId]}: ${match.text}\n`
-  //       })
-  //       .join('\n')
-  //     if ([...matchedSentences].every((char) => char === '\n')) continue
-  //     for (const coordinate of item.coordinates) {
-  //       pdfFactory.value.createHighlightAnnotation({
-  //         page: page - 1,
-  //         contents: stringToUtf16Raw(matchedSentences),
-  //         font: 'Times-Roman',
-  //         rect: [...coordinate],
-  //         author: 'plagiarism checker',
-  //         color: { r: 255, g: 255, b: 0 },
-  //         opacity: 0.35,
-  //         border: {
-  //           horizontal_corner_radius: 2,
-  //           vertical_corner_radius: 2,
-  //           border_width: 1
-  //         }
-  //       })
-  //     }
-  //   }
-  // }
-  // window.mainApi.invoke(
-  //   IPC_CHANNELS.MAIN.SAVE_FILE,
-  //   `plagiarism_checker_${transformedData[docId]}`,
-  //   pdfFactory.value.write(),
-  //   (error) => {
-  //     if (error) {
-  //       toast.add({
-  //         severity: 'error',
-  //         summary: 'Lỗi',
-  //         detail: 'Lỗi khi lưu file',
-  //         life: 3000
-  //       })
-  //     } else {
-  //       toast.add({
-  //         severity: 'success',
-  //         summary: 'Thành công',
-  //         detail: 'Lưu file thành công',
-  //         life: 3000
-  //       })
-  //     }
-  //   }
-  // )
-
-  const highlightDataToSend = highlightData.value.flatMap((h) => h.data)
+  const highlightDataToSend = pdfRef.value.getHighlightModified().flatMap((h) => h.data)
   const documentPathToSend = documentPath.value
   await window.mainApi.send(
     IPC_CHANNELS.MAIN.HIGHLIGHT,
     documentPathToSend,
-    _.cloneDeep(highlightDataToSend),
-    _.cloneDeep(comparisonData.value)
+    _.cloneDeep(highlightDataToSend)
   )
 }
 

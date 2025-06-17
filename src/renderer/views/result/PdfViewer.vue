@@ -1,27 +1,15 @@
 <template>
   <div class="pdf-viewer-container">
     <div class="pages-container" ref="pagesContainer">
-      <div
-        v-for="page in totalPages"
-        :key="page"
-        :data-page="page"
-        class="page-container"
-        v-intersection-observer="{
-          callback: handleIntersection,
-          threshold: 0.5,
-          once: true
-        }"
-      >
+      <div v-for="page in totalPages" :key="page" :data-page="page" class="page-container" v-intersection-observer="{
+        callback: handleIntersection,
+        threshold: 0.5,
+        once: true
+      }">
         <div v-if="pageLoadingStates.get(page)" class="load"> Loading page {{ page }}... </div>
         <template v-else-if="loadedPages.has(page)">
-          <VuePDF
-            :page="loadedPages.get(page)"
-            :scale="1"
-            :highlight-data="highlightDataInternal[page - 1].data"
-            :highlight-options="highlightOptions"
-            :highlight-call-back="callback"
-            class="pdf-content"
-          />
+          <VuePDF :page="loadedPages.get(page)" :scale="1" :highlight-data="highlightDataInternal[page - 1].data"
+            :highlight-options="highlightOptions" :highlight-call-back="callback" class="pdf-content" />
         </template>
         <div v-else-if="pageErrors.get(page)" class="error">
           Error loading page {{ page }}: {{ pageErrors.get(page) }}
@@ -29,15 +17,8 @@
         <div v-else class="load"> Page {{ page }} - Scroll to load </div>
       </div>
     </div>
-    <HighlightTooltip
-      :visible="tooltipVisible"
-      :data="tooltipData"
-      :position="tooltipPosition"
-      @close="closeTooltip"
-      @delete="handleDeleteMatch"
-      @edit="handleEditMatch"
-      @restore="handleRestoreMatch"
-    />
+    <HighlightTooltip :visible="tooltipVisible" :data="tooltipData" :position="tooltipPosition" @close="closeTooltip"
+      @delete="handleDeleteMatch" @edit="handleEditMatch" @restore="handleRestoreMatch" />
   </div>
 </template>
 
@@ -94,8 +75,6 @@ const highlightOptions = ref({
   ignoreCase: true
 })
 
-const highlightMap = new Map()
-
 const callback = (e: MouseEvent, sentenceId: number) => {
   if (!props.comparisonData || props.comparisonData.length === 0) {
     return
@@ -142,7 +121,6 @@ const highlightDataInternal = computed(() => {
   const data = []
   for (let i = 0; i < props.highlightData.length; i++) {
     const pageData = props.highlightData[i]
-    console.log('Processing page:', i + 1, 'with highlights:', pageData)
     const filteredPageData = []
     for (let j = 0; j < pageData.data.length; j++) {
       const highlight = pageData.data[j]
@@ -154,7 +132,6 @@ const highlightDataInternal = computed(() => {
         filteredPageData.push(highlight)
       }
     }
-    console.log('Filtered highlights for page:', i + 1, '->', filteredPageData)
     data.push({
       page: i,
       data: filteredPageData
@@ -168,56 +145,15 @@ const highlightDataInternal = computed(() => {
       })
     }
   }
-  console.log('Processed highlight data:', data)
   return data
 })
 
-const reload = async () => {
-  try {
-    if (pdfInstance.value) {
-      await pdfInstance.value.destroy()
-    }
-
-    // Clear highlight map
-    highlightMap.clear()
-
-    // Reload PDF
-    const pdfSrc = await window.mainApi.invoke(IPC_CHANNELS.MAIN.READ_FILE, props.filePath)
-    let raw = atob(pdfSrc)
-    let rawLength = raw.length
-    let pdfBase64 = new Uint8Array(new ArrayBuffer(rawLength))
-
-    for (let i = 0; i < rawLength; i++) {
-      pdfBase64[i] = raw.charCodeAt(i)
-    }
-
-    pdfInstance.value = PDFJS.getDocument({ data: pdfBase64 })
-    totalPages.value = (await pdfInstance.value.promise).numPages
-
-    viewport.value = await (
-      await (await pdfInstance.value.promise).getPage(1)
-    ).getViewport({ scale: 1 })
-    const data = await (await pdfInstance.value.promise).getData()
-    props.updateAnnotation(data)
-
-    // Force re-render of PDF pages
-    const pagesContainer = document.querySelector('.pages-container')
-    if (pagesContainer) {
-      const pages = pagesContainer.querySelectorAll('.pdf-content')
-      pages.forEach((page) => {
-        const vuePdf = page.querySelector('vue-pdf')
-        if (vuePdf) {
-          vuePdf.$forceUpdate()
-        }
-      })
-    }
-  } catch (error) {
-    console.error('Error reloading PDF: ', error)
-  }
+const getHighlightModified = () => {
+  return highlightDataInternal.value
 }
 
 defineExpose({
-  reload
+  getHighlightModified
 })
 
 onMounted(async () => {

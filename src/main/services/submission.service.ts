@@ -149,7 +149,6 @@ export function setupSubmissionHandlers() {
 
 export async function getAndSaveResult() {
   const createdSubmission = await submissionService.getCreatedSubmissions()
-  console.log('Created Submissions:', JSON.stringify(createdSubmission))
   for (const submission of createdSubmission) {
     try {
       const response = await HttpService.getInstance()

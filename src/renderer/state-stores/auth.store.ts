@@ -49,7 +49,6 @@ export const useAuthStore = defineStore('auth', {
                 IPC_CHANNELS.MAIN.GET_SUBMISSION_RESULT,
                 submission.id
               )
-              console.log(result)
               if (result) {
                 submissionState.result = result.results
                 submissionState.docIdToFileName = docIdToFileName

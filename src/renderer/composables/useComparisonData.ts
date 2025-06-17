@@ -78,14 +78,6 @@ export function useComparisonData(
   }
 
   const handleRestoreMatch = (match: MatchSentenceUI) => {
-    // if (match) {
-    //   match.isDeleted = false
-    //   match.reasonType = undefined
-    //   match.reasonText = ''
-    //   reasonType.value = undefined
-    //   reasonText.value = ''
-    //   console.log('Match restored:', match)
-    // }
     comparisonData.value[match.sourceSentenceId].matchedSentences = comparisonData.value[
       match.sourceSentenceId
     ].matchedSentences.map((m) => {

@@ -54,7 +54,6 @@ async function findAndHighlight(reset = false) {
       getHighlightOptionsWithDefaults()
     )
     highlightMatches(matches, textContent!, textDivs, props.highlightCallBack)
-    console.log('highlight matches', matches)
     emit('highlight', {
       matches,
       textContent,
@@ -121,11 +120,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    ref="layer"
-    class="textLayer"
-    style="display: block; margin: 0 auto"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
-  />
+  <div ref="layer" class="textLayer" style="display: block; margin: 0 auto" @mousedown="onMouseDown"
+    @mouseup="onMouseUp" />
 </template>

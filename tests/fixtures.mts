@@ -36,9 +36,6 @@ export const beforeAll = async () => {
 
   await page.waitForEvent('load')
 
-  page.on('console', console.log)
-  page.on('pageerror', console.log)
-
   const evaluateResult = await appElectron.evaluate(async ({ app, BrowserWindow }) => {
     const currentWindow = BrowserWindow.getFocusedWindow()
 

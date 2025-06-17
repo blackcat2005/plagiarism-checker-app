@@ -12,17 +12,21 @@ PDFJS.GlobalWorkerOptions.workerSrc = LegacyWorker
 export default class HighlightService {
   static initialize(): void {
     // Initialize highlight service
-    ipcMain.on(IPC_CHANNELS.MAIN.HIGHLIGHT, async (event, filePath, highlightData) => {
-      const outputPath = await dialog.showSaveDialog({
-        title: 'Save Highlighted PDF',
-        defaultPath: filePath.replace(/\.pdf$/, '_highlighted.pdf'),
-        filters: [{ name: 'PDF Files', extensions: ['pdf'] }]
-      })
-      await highlightPDFWithAdvancedSearch(filePath, outputPath.filePath, highlightData, {
-        ignoreCase: true,
-        completeWords: false
-      })
-    })
+    ipcMain.on(
+      IPC_CHANNELS.MAIN.HIGHLIGHT,
+      async (event, filePath, highlightData, comparisonData) => {
+        const outputPath = await dialog.showSaveDialog({
+          title: 'Save Highlighted PDF',
+          defaultPath: filePath.replace(/\.pdf$/, '_highlighted.pdf'),
+          filters: [{ name: 'PDF Files', extensions: ['pdf'] }]
+        })
+
+        await highlightPDFWithAdvancedSearch(filePath, outputPath.filePath, highlightData, {
+          ignoreCase: true,
+          completeWords: false
+        })
+      }
+    )
   }
 }
 

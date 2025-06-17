@@ -4,11 +4,8 @@
     <PageHeader :title="`Chi tiết kết quả kiểm tra ${submissionName}`" @back="router.back">
       <template #actions>
         <div class="flex justify-content-end mb-3">
-          <Button
-            :icon="isTableView ? 'pi pi-chart-bar' : 'pi pi-table'"
-            :label="isTableView ? 'Xem biểu đồ' : 'Xem bảng'"
-            @click="toggleView"
-          />
+          <Button :icon="isTableView ? 'pi pi-chart-bar' : 'pi pi-table'"
+            :label="isTableView ? 'Xem biểu đồ' : 'Xem bảng'" @click="toggleView" />
         </div>
       </template>
     </PageHeader>
@@ -25,14 +22,8 @@
     <!-- Table view -->
     <div v-else class="p-4 surface-100 border-round">
       <div class="surface-card p-4 border-round">
-        <DataTable
-          :value="tableData"
-          :paginator="true"
-          :rows="10"
-          class="p-datatable-sm"
-          :scrollable="true"
-          scrollHeight="calc(100vh - 300px)"
-        >
+        <DataTable :value="tableData" :paginator="true" :rows="10" class="p-datatable-sm" :scrollable="true"
+          scrollHeight="calc(100vh - 300px)">
           <Column field="fileName" header="Tên file"></Column>
           <Column field="percentage" header="Tỷ lệ trùng lặp">
             <template #body="slotProps">
@@ -43,12 +34,8 @@
           </Column>
           <Column field="action" header="Hành động">
             <template #body="slotProps">
-              <Button
-                icon="pi pi-eye"
-                text
-                v-p-tooltip.bottom="'Xem chi tiết văn bản'"
-                @click="handleAction(slotProps.data.docId)"
-              />
+              <Button icon="pi pi-eye" text v-p-tooltip.bottom="'Xem chi tiết văn bản'"
+                @click="handleAction(slotProps.data.docId)" />
             </template>
           </Column>
         </DataTable>
@@ -72,7 +59,6 @@ import PageHeader from '@/renderer/components/PageHeader.vue'
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Tooltip from 'primevue/tooltip'
 
 use([GridComponent, BarChart, CanvasRenderer, TooltipComponent])
 
@@ -101,13 +87,11 @@ const getPercentageClass = (percentage) => {
 const click = (params) => {
   if (params.componentType === 'series' && submission) {
     const docId = Number(listDocId[params.dataIndex])
-    console.log(`Clicked on ${docId} and submissionId ${submissionId}`)
     router.push({ path: ROUTES.CHECK_RESULT_PDF_VIEW, query: { docId, submissionId } })
   }
 }
 
 const handleAction = (docId) => {
-  console.log(`Handling action for docId: ${docId} and submissionId: ${submissionId}`)
   router.push({ path: ROUTES.CHECK_RESULT_PDF_VIEW, query: { docId, submissionId } })
 }
 
